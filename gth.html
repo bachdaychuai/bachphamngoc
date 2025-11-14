@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Giới thiệu - Bách Phạm Ngọc</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background:var(--bg);
+      font-family:Inter, Arial, sans-serif;
+      color:white;
+    }
+
+    /* DÒNG HIỂN THỊ THỜI GIAN */
+    #datetime {
+      position:absolute;
+      top:20px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:20px;
+      font-weight:600;
+      text-align:center;
+      opacity:0.9;
+    }
+
+    .card{
+      text-align:center;
+      padding:40px;
+      border-radius:20px;
+      background:rgba(255,255,255,0.05);
+      backdrop-filter:blur(10px);
+      box-shadow:0 0 30px rgba(255,255,255,0.1);
+    }
+    h1{
+      font-size:64px;
+      font-weight:900;
+      letter-spacing:2px;
+    }
+    .sub{
+      font-size:20px;
+      margin-top:10px;
+      opacity:0.9;
+    }
+    .year{
+      margin-top:8px;
+      font-size:22px;
+      font-weight:600;
+    }
+    .intro-list{
+      margin-top:20px;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:24px;
+    }
+    .intro-item{
+      font-weight:600;
+      font-size:16px;
+    }
+
+    .controls{
+      margin-top:25px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      padding:10px 16px;
+      border:none;
+      border-radius:10px;
+      font-weight:600;
+      cursor:pointer;
+      color:white;
+      background:rgba(255,255,255,0.1);
+      transition: background 0.3s;
+    }
+    .btn:hover{
+      background:rgba(255,255,255,0.2);
+    }
+
+    .color-picker {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:10px;
+      background:rgba(255,255,255,0.06);
+      font-weight:600;
+      font-size:14px;
+    }
+    .color-picker input[type="color"]{
+      border:none;
+      background:transparent;
+      width:32px;
+      height:32px;
+      padding:0;
+      cursor:pointer;
+    }
+
+    .char {
+      display:inline-block;
+      transition: color 0.2s;
+      white-space:pre;
+    }
+
+    @media(max-width:600px){
+      h1{font-size:40px;}
+      .sub{font-size:16px;}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HIỂN THỊ NGÀY GIỜ REALTIME -->
+  <div id="datetime"></div>
+
+  <div class="card">
+    <h1 id="name"></h1>
+    <div class="sub">Xin chào — mình là Bách Phạm Ngọc.</div>
+    <div class="year">Sinh năm 2008</div>
+
+    <div class="intro-list">
+      <div class="intro-item" id="intro1">Yêu thích lọ</div>
+      <div class="intro-item" id="intro2">Cưới môn Tiếng Anh</div>
+      <div class="intro-item" id="intro3">Li dị với môn Hóa</div>
+      <div class="intro-item" id="intro4">Hẹn hò với môn Toán</div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" onclick="setPink()">Màu hồng</button>
+      <button class="btn" onclick="setRainbow()">Màu nhấp nháy</button>
+
+      <!-- NÚT RANDOM 1 MÀU -->
+      <button class="btn" onclick="setRandomColor()">Random màu</button>
+
+      <label class="color-picker">
+        Chọn màu 
+        <input type="color" id="colorPicker" value="#ff66cc">
+      </label>
+    </div>
+  </div>
+
+  <script>
+    function splitText(element) {
+      const text = element.textContent;
+      element.textContent = "";
+      text.split("").forEach(ch => {
+        const span = document.createElement("span");
+        span.classList.add("char");
+        span.innerHTML = ch === " " ? "&nbsp;" : ch;
+        element.appendChild(span);
+      });
+    }
+
+    const nameText = "Bách Phạm Ngọc";
+    const nameEl = document.getElementById("name");
+    nameEl.textContent = nameText;
+    splitText(nameEl);
+
+    const introItems = document.querySelectorAll(".intro-item");
+    introItems.forEach(splitText);
+
+    const chars = document.querySelectorAll(".char");
+    let hue = 0;
+    let rainbowActive = true;
+
+    function animate() {
+      if (rainbowActive) {
+        hue = (hue + 3) % 360;
+        chars.forEach((ch, i) => {
+          const color = `hsl(${(hue + i * 15) % 360}, 100%, 60%)`;
+          ch.style.color = color;
+        });
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    function setPink() {
+      rainbowActive = false;
+      chars.forEach(ch => ch.style.color = "#ff66cc");
+    }
+
+    function setRainbow() {
+      rainbowActive = true;
+    }
+
+    function setRandomColor() {
+      rainbowActive = false;
+      const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+      chars.forEach(ch => ch.style.color = randomColor);
+    }
+
+    const colorPicker = document.getElementById("colorPicker");
+    colorPicker.addEventListener("input", e => {
+      rainbowActive = false;
+      const color = e.target.value;
+      chars.forEach(ch => ch.style.color = color);
+    });
+
+    /* =====================
+       CẬP NHẬT THỜI GIAN + LỜI CHÚC
+       ===================== */
+    function updateDateTime() {
+      const dt = document.getElementById("datetime");
+      const now = new Date();
+
+      const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      };
+
+      const dateStr = now.toLocaleDateString("vi-VN", options);
+      const timeStr = now.toLocaleTimeString("vi-VN");
+
+      const hour = now.getHours();
+      let greet = "";
+
+      if (hour >= 5 && hour < 10) greet = "🌅 Chúc buổi sáng tốt lành!";
+      else if (hour >= 10 && hour < 13) greet = "🌞 Chúc buổi trưa vui vẻ!";
+      else if (hour >= 13 && hour < 18) greet = "🌤 Chúc buổi chiều tốt lành!";
+      else if (hour >= 18 && hour < 23) greet = "🌙 Chúc buổi tối tuyệt vời!";
+      else greet = "😴 Chúc bạn ngủ ngon!";
+
+      dt.innerHTML = `${dateStr} — ${timeStr}<br>${greet}`;
+    }
+
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+  </script>
+
+</body>
+</html>
